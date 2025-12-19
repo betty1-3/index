@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Voice → JSON</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #0f172a;
+      color: #e5e7eb;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .box {
+      width: 90%;
+      max-width: 500px;
+      background: #020617;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      background: #22c55e;
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    pre {
+      background: #020617;
+      padding: 10px;
+      border-radius: 6px;
+      overflow-x: auto;
+      font-size: 13px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="box">
+    <h2>🎙️ Voice to JSON</h2>
+
+    <button onclick="startMic()">Start Speaking</button>
+
+    <h4>Transcript</h4>
+    <p id="transcript">—</p>
+
+    <h4>Backend Response</h4>
+    <pre id="response">—</pre>
+  </div>
+
+  <script>
+    const BACKEND_URL = "https://backendllm-uoeo.onrender.com/parse";
+
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      alert("Speech Recognition not supported in this browser");
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = "en-IN";
+    recognition.interimResults = false;
+    recognition.continuous = false;
+
+    recognition.onresult = async (event) => {
+      const text = event.results[0][0].transcript;
+      document.getElementById("transcript").innerText = text;
+
+      try {
+        const res = await fetch(BACKEND_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text })
+        });
+
+        const data = await res.json();
+        document.getElementById("response").innerText =
+          JSON.stringify(data, null, 2);
+
+      } catch (err) {
+        document.getElementById("response").innerText = err.toString();
+      }
+    };
+
+    function startMic() {
+      recognition.start();
+    }
+  </script>
+</body>
+</html>
