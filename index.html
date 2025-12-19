@@ -58,7 +58,8 @@
   </div>
 
   <script>
-    const BACKEND_URL = "https://backendllm-uoeo.onrender.com/voice-decide";
+    // 🔴 CHANGED ENDPOINT
+    const BACKEND_URL = "https://backendllm-uoeo.onrender.com/actions";
 
     const SpeechRecognition =
       window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -80,7 +81,8 @@
         const res = await fetch(BACKEND_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text })
+          // 🔴 CHANGED BODY KEY
+          body: JSON.stringify({ command: text })
         });
 
         const data = await res.json();
@@ -98,5 +100,3 @@
   </script>
 </body>
 </html>
-
-
